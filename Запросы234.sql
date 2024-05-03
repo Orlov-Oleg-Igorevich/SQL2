@@ -1,9 +1,8 @@
 --- 2 задание
 
 -- Название и продолжительность самого длительного трека
-select title, max(duration) from tracks
-group by title
-limit 1;
+select title, duration from tracks t
+where duration = (select max(duration) from tracks);
 
 -- Название треков, продолжительность которых не менее 3,5 минут.
 select title from tracks
@@ -40,10 +39,9 @@ join tracks t on a.id = t.album_id
 group by a.title;
 
 -- Все исполнители, которые не выпустили альбомы в 2020 году.
-select a.nickname from artists a
-join artistsalbums a2 on a.id = a2.artist_id
-join albums a3 on a3.id = a2.album_id 
-where EXTRACT(year FROM a3.year_of_release) <> '2020'
+select nickname from artists a
+where nickname not in (select a.nickname from artists a join artistsalbums a2 on a.id = a2.artist_id
+join albums a3 on a3.id = a2.album_id where EXTRACT(year FROM a3.year_of_release) = '2020')
 
 -- Названия сборников, в которых присутствует конкретный исполнитель (выберите его сами)
 select c.title from compilations c
@@ -74,7 +72,7 @@ where c.compilation_id is NULL;
 select nickname from artists a 
 join artistsalbums a2 on a2.artist_id = a.id
 join tracks t on t.album_id = a2.album_id
-where t.duration = (select max(duration) from tracks t2 limit 1);
+where t.duration = (select max(duration) from tracks t2);
 
 -- Названия альбомов, содержащих наименьшее количество треков.
 select a.title from albums a 
